@@ -1,0 +1,20 @@
+{
+  "name": "talkgpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "https://twitter.com/romechenko",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "nlpcloud": "^1.0.40",
+    "stream": "^0.0.2",
+    "websocket-stream": "^5.5.2"
+  }
+}
