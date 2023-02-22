@@ -1,6 +1,6 @@
 # phone-to-text
 
-This express app exposes a web socket endpoint at `/media`. This is the endpoint that Twilio streams audio to.
+This express app exposes a web socket endpoint at `/media`. This is the endpoint that Twilio streams audio to. The audio is then sent to the [NLP Cloud](https://www.nlpcloud.io/) service for transcription. It's fast enough to transcribe a call in real time and act on the transcription within the call.
 
 ## Requirements
 
