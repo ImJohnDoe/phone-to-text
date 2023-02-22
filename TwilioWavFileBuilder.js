@@ -7,7 +7,6 @@ class TwilioWavFileBuilder {
      */
     constructor(onConnected, printDebug = false) {
         this._printDebug = printDebug;
-        console.log(printDebug);
         /**
          * @type {Function} onConnected - the function to call when a new call connects
          */

@@ -37,7 +37,7 @@ class NlpCloudTranscriber {
             .catch((err) => {
                 this.printDebug ? console.error(err.response.status) : null;
                 this.printDebug ? console.error(err.response.data.detail) : null;
-                return '[ERROR: ${err.response.status}]';
+                return `[ERROR: ${err.response.status}]`;
             });
     }
 }

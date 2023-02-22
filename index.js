@@ -7,10 +7,11 @@ const { TwilioWavFileBuilder } = require("./TwilioWavFileBuilder.js");
 const { NlpCloudTranscriber } = require("./NlpCloudTranscriber.js");
 
 const PORT = 8080;
-const printDebug = true;
+const printDebug = false;
 const nlpCloundToken = process.env.NLP_CLOUD_TOKEN;
 const COUNT_WORKERS = 4;
 const MINIMUM_AUDIO_LENGTH = 0.5;
+const TRANSCRIBE_RATE_SECONDS = 5;
 
 const app = express();
 
@@ -36,21 +37,21 @@ app.ws("/media", (ws, req) => {
             if (!wavBuilder.alive) {
                 return;
             }
-            console.log(`workers.length: ${workers.length}`);
+            printDebug ? console.log(`workers.length: ${workers.length}`) : null;
             if (workers.length < COUNT_WORKERS && wavBuilder.durationInSeconds > MINIMUM_AUDIO_LENGTH) {
                 const file = wavBuilder.popFile();
                 const worker = {
                     promise: nlpTranscriber.transcribeFile(file)
                 }
                 worker.promise.then((result) => {
-                    printDebug ? console.log(`[RESULT]: ${result}`) : null;
+                    console.log(`[RESULT]: ${result}`);
                     workers = workers.filter(w => w !== worker);
                 })
                 workers.push(worker);
             }
-            setTimeout(assignWork, 500);
+            setTimeout(assignWork, TRANSCRIBE_RATE_SECONDS * 1000);
         }
-        setTimeout(assignWork, 500);
+        setTimeout(assignWork, TRANSCRIBE_RATE_SECONDS * 1000);
     }, printDebug);
 
     mediaStream
