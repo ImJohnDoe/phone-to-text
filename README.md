@@ -31,6 +31,7 @@ You should receive a text message with the transcription of the call.
 To tell Twilio about this endpoint create a [TwiML bin](https://console.twilio.com/us1/develop/twiml-bins/twiml-bins) and set the Voice URL to this endpoint.
 
 example of a TwiML app:
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
 <Start>
@@ -44,6 +45,7 @@ example of a TwiML app:
     All done waiting. Good bye.
 </Say>
 </Response>
+```
 
 After you have created the TwiML app, you can use it in a Twilio phone number.
 https://www.twilio.com/console/phone-numbers/incoming
