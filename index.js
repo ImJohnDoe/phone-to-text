@@ -4,10 +4,13 @@ const expressWebSocket = require('express-ws');
 const websocketStream = require('websocket-stream/stream');
 
 const { TwilioWavFileBuilder } = require("./TwilioWavFileBuilder.js");
-const { NLPTranscriber } = require("./NLPCloudTranscriber.js");
+const { NlpCloudTranscriber } = require("./NlpCloudTranscriber.js");
 
 const PORT = 8080;
+const printDebug = true;
 const nlpCloundToken = process.env.NLP_CLOUD_TOKEN;
+const COUNT_WORKERS = 4;
+const MINIMUM_AUDIO_LENGTH = 0.5;
 
 const app = express();
 
@@ -20,16 +23,40 @@ app.ws("/media", (ws, req) => {
     // Wrap the websocket in a Node stream
     const mediaStream = websocketStream(ws);
 
-    console.log('New WebSocket connection');
+    printDebug ? console.log('New WebSocket connection') : null;
 
-    const wavBuilder = new TwilioWavFileBuilder();
-    const nlpTranscriber = new NLPTranscriber(nlpCloundToken);
+    const nlpTranscriber = new NlpCloudTranscriber(nlpCloundToken, printDebug);
+    const wavBuilder = new TwilioWavFileBuilder(() => {
+        printDebug ? console.log('On Connected') : null;
+        /**
+         * @type {Array<Promise>} workers - the array of promises that are currently working
+         */
+        let workers = [];
+        let assignWork = () => {
+            if (!wavBuilder.alive) {
+                return;
+            }
+            console.log(`workers.length: ${workers.length}`);
+            if (workers.length < COUNT_WORKERS && wavBuilder.durationInSeconds > MINIMUM_AUDIO_LENGTH) {
+                const file = wavBuilder.popFile();
+                const worker = {
+                    promise: nlpTranscriber.transcribeFile(file)
+                }
+                worker.promise.then((result) => {
+                    printDebug ? console.log(`[RESULT]: ${result}`) : null;
+                    workers = workers.filter(w => w !== worker);
+                })
+                workers.push(worker);
+            }
+            setTimeout(assignWork, 500);
+        }
+        setTimeout(assignWork, 500);
+    }, printDebug);
 
     mediaStream
         .pipe(wavBuilder.chunkTwilioIntoWavChunks())
-        .pipe(nlpTranscriber.transcribeStream())
         .on('data', msg => {
-            console.log(`[GOT MSG]: ${msg}`);
+            printDebug ? console.log(`[GOT MSG]: ${msg}`) : null;
         });
 });
 
