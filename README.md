@@ -1,5 +1,9 @@
 # phone-to-text
 
+## Status
+
+this project is pretty much dead. The openAI ChatGPT voice mode is just better. That being said, there is something to be explored with actively listening while responding.
+
 This express app exposes a web socket endpoint at `/media`. This is the endpoint that Twilio streams audio to. The audio is then sent to the [NLP Cloud](https://www.nlpcloud.io/) service for transcription. It's fast enough to transcribe a call in real time and act on the transcription within the call.
 
 ## Requirements
